@@ -42,12 +42,24 @@ const characterSlice = createSlice({
       })
 
       .addCase(getCharacters.fulfilled, (state, action) => {
+        const { results, next } = action.payload;
+
         state.loading = false;
-        state.characters = action.payload;
+        state.refreshing = false;
+        state.hasMore = !!next;
+
+        if (action.meta.arg === 1) {
+          state.characters = results;
+          state.page = 2;
+        } else {
+          state.characters = [...state.characters, ...results];
+          state.page += 1;
+        }
       })
 
       .addCase(getCharacters.rejected, (state) => {
         state.loading = false;
+        state.refreshing = false;
         state.error = "Something went wrong";
       });
   },

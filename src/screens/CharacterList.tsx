@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,39 +12,43 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCharacters } from "../store/characterSlices";
 import { RootState } from "../store/store";
 import { Person } from "../types";
+import { useDebounce } from "../utils/useDebounce";
 
 export default function CharacterList({ navigation }: any) {
   const [search, setSearch] = useState<string>("");
   const dispatch = useDispatch<any>();
-  const { characters, loading } = useSelector(
+  const { characters, loading, refreshing, page, hasMore } = useSelector(
     (state: RootState) => state.characters,
   );
+  const debouncedSearch = useDebounce(search, 400);
 
   useEffect(() => {
-    dispatch(getCharacters());
+    dispatch(getCharacters(1));
   }, []);
 
-  const filteredCharacters = characters.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const onRefresh = useCallback(() => {
+    dispatch(getCharacters(1));
+  }, []);
 
-  // TODO: make the function debounced
-  const debouncedSearch = useCallback(
-    (value: string) => setSearch(value),
-    [search],
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      dispatch(getCharacters(page));
+    }
+  }, [loading, hasMore, page, dispatch]);
+
+  const filteredCharacters = characters.filter((c) =>
+    c.name.toLowerCase().includes(debouncedSearch.toLowerCase()),
   );
 
   const goToDetails = (character: Person) =>
     navigation.navigate("Detail", { character });
-
-  if (loading) return <ActivityIndicator size="large" />;
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
       <TextInput
         placeholder="Search Character ..."
         value={search}
-        onChangeText={debouncedSearch}
+        onChangeText={setSearch}
         style={{
           padding: 10,
           borderWidth: 1,
@@ -53,9 +57,26 @@ export default function CharacterList({ navigation }: any) {
         }}
       />
 
+      {loading && characters.length === 0 && (
+        <ActivityIndicator size="large" style={{ marginTop: 20 }} />
+      )}
+
+      {!loading && filteredCharacters.length === 0 && (
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          No characters found 🚀
+        </Text>
+      )}
+
       <FlatList
         data={filteredCharacters}
         keyExtractor={(item) => item.name}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
+        ListFooterComponent={
+          loading ? <ActivityIndicator style={{ margin: 10 }} /> : null
+        }
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => goToDetails(item)}>
             <View

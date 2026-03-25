@@ -5,8 +5,8 @@ export const fetchCharactersWithImageUrls = async (page = 1) => {
   const res = await fetch(`https://swapi.dev/api/people/?page=${page}`);
   if (!res.ok) throw new Error("Failed to fetch characters");
 
-  const data = await res.json();
-  const characters = data.results;
+  const { results, next } = await res.json();
+  const characters = results;
 
   // call the API for getting Images
   const charactersWImageUrls = await Promise.all(
@@ -17,7 +17,7 @@ export const fetchCharactersWithImageUrls = async (page = 1) => {
       };
     }),
   );
-  return charactersWImageUrls;
+  return { results: charactersWImageUrls, next };
 };
 
 export const fetchHomeworld = async (url: string) => {
