@@ -124,12 +124,29 @@ Used **Redux Toolkit** for:
 * Optimized FlatList rendering
 * Controlled pagination triggers
 
+---
+
 ## 🙌 Acknowledgements
 
 * [Star Wars Visual Guide API](https://swapi.dev/)
 * [AKABAB](https://akabab.github.io/starwars-api/)
 
 ---
+
+## 🎨 UI
+
+### 📱 Listing / Detail
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/85c3f148-a227-45bc-b2f5-6441f31a03c7" width="45%" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://github.com/user-attachments/assets/7447ca5a-254a-45a7-911d-58cdcd3d4896" width="45%" />
+</p>
+
+### 🔍 Search
+<p align="center">
+ <img width="45%" alt="image" src="https://github.com/user-attachments/assets/afb7e0c6-d569-49dd-835a-e615d65998a5" />
+</p>
+
 
 ## 📌 Author
 
